@@ -1,0 +1,94 @@
+import random
+import time
+import matplotlib.pyplot as plt
+
+
+# Selection Sort
+def selection_sort(arr):
+
+    n = len(arr)
+
+    for i in range(n):
+
+        min_index = i
+
+        for j in range(i + 1, n):
+
+            if arr[j] < arr[min_index]:
+                min_index = j
+
+        arr[i], arr[min_index] = arr[min_index], arr[i]
+
+    return arr
+
+
+# Quick Sort
+def quick_sort(arr, left, right):
+
+    if left >= right:
+        return
+
+    pivot = arr[(left + right) // 2]
+
+    i = left
+    j = right
+
+    while i <= j:
+
+        while arr[i] < pivot:
+            i += 1
+
+        while arr[j] > pivot:
+            j -= 1
+
+        if i <= j:
+            arr[i], arr[j] = arr[j], arr[i]
+            i += 1
+            j -= 1
+
+    quick_sort(arr, left, j)
+    quick_sort(arr, i, right)
+
+
+# генерация случайного массива
+def random_array(n):
+    return [random.randint(0, 100000) for _ in range(n)]
+
+
+sizes = [1000, 5000, 10000, 50000]
+
+selection_times = []
+quick_times = []
+
+for size in sizes:
+
+    arr = random_array(size)
+
+    # Selection Sort
+    start = time.time()
+    selection_sort(arr.copy())
+    end = time.time()
+
+    selection_times.append(end - start)
+
+    # Quick Sort
+    arr2 = arr.copy()
+
+    start = time.time()
+    quick_sort(arr2, 0, len(arr2) - 1)
+    end = time.time()
+
+    quick_times.append(end - start)
+
+
+# график
+plt.plot(sizes, selection_times, label="Selection Sort")
+plt.plot(sizes, quick_times, label="Quick Sort")
+
+plt.xlabel("Размер массива")
+plt.ylabel("Время (секунды)")
+plt.title("Сравнение алгоритмов сортировки")
+
+plt.legend()
+
+plt.show()
