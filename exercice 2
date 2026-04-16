@@ -1,0 +1,78 @@
+функцию кодирования Хаффмана;
+Код:
+import heapq
+from collections import Counter
+
+# Класс узла дерева Хаффмана
+class Node:
+    def __init__(self, char, freq):
+        self.char = char      # символ
+        self.freq = freq      # частота
+        self.left = None
+        self.right = None
+
+    # Нужно для работы heapq
+    def __lt__(self, other):
+        return self.freq < other.freq
+
+
+def huffman_encoding(text):
+    if not text:
+        return "", {}
+
+    # Подсчёт частот символов
+    frequency = Counter(text)
+
+    # Создание кучи
+    heap = [Node(char, freq) for char, freq in frequency.items()]
+    heapq.heapify(heap)
+
+    # Построение дерева
+    while len(heap) > 1:
+        left = heapq.heappop(heap)
+        right = heapq.heappop(heap)
+
+        merged = Node(None, left.freq + right.freq)
+        merged.left = left
+        merged.right = right
+
+        heapq.heappush(heap, merged)
+
+    root = heap[0]
+
+    # Генерация кодов
+    codes = {}
+
+    def build_codes(node, code):
+        if node is None:
+            return
+
+        if node.char is not None:
+            codes[node.char] = code
+
+        build_codes(node.left, code + "0")
+        build_codes(node.right, code + "1")
+
+    build_codes(root, "")
+
+    # Кодирование строки
+    encoded_text = "".join(codes[char] for char in text)
+
+    return encoded_text, codes
+функцию декодирования Хаффмана
+Код:
+def huffman_decoding(encoded_text, codes):
+    # Переворачиваем словарь кодов
+    reverse_codes = {code: char for char, code in codes.items()}
+
+    current_code = ""
+    decoded_text = ""
+
+    for bit in encoded_text:
+        current_code += bit
+
+        if current_code in reverse_codes:
+            decoded_text += reverse_codes[current_code]
+            current_code = ""
+
+    return decoded_text
